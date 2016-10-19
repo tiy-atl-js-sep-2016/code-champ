@@ -20,3 +20,5 @@ function getUser (user) {
     url: `${GH_API}/users/${user}`
   });
 };
+
+export { getUser, getRepoStats };
