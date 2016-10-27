@@ -1,13 +1,12 @@
 import $ from 'jquery';
 
 import { getRepoRanks } from "./github";
-import { rankingTemplate, projectTemplate } from "./templates";
+import { projectTemplate } from "./templates";
 
 var resultsBox = $(".results");
 
 function addTotalsToPage (totals) {
-  var rankings = totals.map(rankingTemplate);
-  var html = projectTemplate(rankings);
+  var html = projectTemplate(totals);
   resultsBox.html(html);
 };
 
@@ -18,6 +17,6 @@ function getRankings (event) {
 
   var results = getRepoRanks(userName, repoName);
   results.then(addTotalsToPage);
-}
+};
 
 $("#submit-button").click(getRankings);
