@@ -40,26 +40,28 @@ function extractUserInfo (user) {
 };
 
 function generateRankings (data) {
-  console.log(data);
   var sorted = _.orderBy(data, ['total'], ['desc']);
   var top10 = _.take(sorted, 10).map(extractUserInfo);
-  var authorRequests = top10.map(function (x) { return getUser(x.author); });
-  var authorData = Promise.all(authorRequests);
-  return authorData.then(function (authors) { generateResults(authors, top10); });
-};
-
-function generateResults (authors, top10) {
-  for (var i = 0; i < top10.length; i++) {
-    top10[i].author = authors[i];
-  }
-
-  console.log(top10);
-
   return top10;
 };
 
+function addAuthorDetails (contributor) {
+  var userData = getUser(contributor.author);
+  return userData.then(function (data) {
+    contributor.author = data;
+    return contributor;
+  });
+}
+
+function finalizeContributors (rankings) {
+  var results = rankings.map(addAuthorDetails);
+  return Promise.all(results);
+};
+
 function getRepoRanks (user, repo) {
-  return getRepoStats(user, repo).then(generateRankings);
+  var stats = getRepoStats(user, repo);
+  var rankings = stats.then(generateRankings);
+  return rankings.then(finalizeContributors);
 };
 
 export { getRepoRanks };
